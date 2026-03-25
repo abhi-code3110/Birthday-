@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You 💛</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{height:100vh;background:linear-gradient(135deg,#ff9a9e,#fad0c4);font-family:'Poppins',sans-serif;overflow:hidden}
+
+.tap-screen,.unlock{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#ff758c,#ff7eb3);color:#fff;z-index:20;cursor:pointer;text-align:center}
+.hidden{display:none}
+
+.game{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;z-index:10}
+.score{font-size:1.5rem}
+.instructions{margin-top:10px}
+
+.floating-heart{position:absolute;top:-50px;font-size:40px;cursor:pointer;animation:fall 4s linear forwards;z-index:15}
+@keyframes fall{0%{top:-50px}100%{top:100vh}}
+
+.card{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.8);opacity:0;max-width:700px;padding:30px;border-radius:20px;background:white;text-align:center;transition:all 0.6s ease;z-index:25}
+.card.show{transform:translate(-50%,-50%) scale(1);opacity:1}
+
+.photo-wrap{display:flex;justify-content:center;margin-bottom:10px}
+.photo{width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 0 15px rgba(255,77,109,0.7);animation:photoFloat 3s ease-in-out infinite,photoGlow 2s ease-in-out infinite alternate}
+
+@keyframes photoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes photoGlow{from{box-shadow:0 0 10px rgba(255,77,109,0.4)}to{box-shadow:0 0 25px rgba(255,77,109,1)}}
+
+h1{font-family:'Great Vibes',cursive;color:#ff4d6d;font-size:2.5rem}
+.typing{margin-top:10px;font-size:1.1rem;color:#444}
+
+.burst{position:absolute;font-size:20px;animation:burst 0.6s forwards}
+@keyframes burst{to{transform:translateY(-40px) scale(1.5);opacity:0}}
+</style>
+</head>
+<body>
+
+<div class="tap-screen" id="tapScreen">
+<h2>💌 Tap to Start</h2>
+<p>Catch hearts to unlock message</p>
+</div>
+
+<div class="game hidden" id="game">
+<div class="score">❤️ <span id="score">0</span>/10</div>
+<div class="instructions">Tap hearts 💖</div>
+</div>
+
+<div class="unlock hidden" id="unlock">
+<h2>💖 You unlocked my heart 💖</h2>
+</div>
+
+<div class="card" id="card">
+  <div class="photo-wrap">
+    <img src="https://via.placeholder.com/150" id="herPhoto" class="photo">
+  </div>
+<h1>Happy Birthday 💫</h1>
+<div class="typing" id="text"></div>
+</div>
+
+<audio id="music" loop>
+<source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3">
+</audio>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+
+const message = `Happy Birthday to you...
+Things may not be the same between us, but my wishes for you have never changed. I still care, I still remember, and somewhere I still hope. I hope life gives you all the happiness you deserve, and maybe someday, we'll talk again like we used to. Until then, just know that someone here is quietly wishing the best for you, always.`;
+
+let score=0;
+let interval;
+
+function createHeart(){
+ const h=document.createElement("div");
+ h.className="floating-heart";
+ h.innerHTML="💖";
+ h.style.left=Math.random()*90+"vw";
+
+ h.onclick=()=>{
+  for(let i=0;i<5;i++){
+   const b=document.createElement("div");
+   b.className="burst";
+   b.innerHTML="💖";
+   b.style.left=h.style.left;
+   b.style.top=h.offsetTop+"px";
+   document.body.appendChild(b);
+   setTimeout(()=>b.remove(),600);
+  }
+
+  score++;
+  document.getElementById("score").innerText=score;
+  h.remove();
+
+  if(score>=10){
+   clearInterval(interval);
+   showUnlock();
+  }
+ };
+
+ document.body.appendChild(h);
+ setTimeout(()=>h.remove(),4000);
+}
+
+function startGame(){
+ document.getElementById("tapScreen").classList.add("hidden");
+ document.getElementById("game").classList.remove("hidden");
+ document.getElementById("music").play();
+ interval=setInterval(createHeart,800);
+}
+
+function showUnlock(){
+ document.getElementById("game").classList.add("hidden");
+ const u=document.getElementById("unlock");
+ u.classList.remove("hidden");
+
+ setTimeout(()=>{
+  u.classList.add("hidden");
+  showMessage();
+ },2000);
+}
+
+function showMessage(){
+ const card=document.getElementById("card");
+ card.classList.add("show");
+ typeText();
+}
+
+function typeText(){
+ let i=0;
+ const el=document.getElementById("text");
+ el.innerHTML="";
+
+ function step(){
+  if(i>=message.length)return;
+  const c=message[i];
+  el.innerHTML += (c==='\n'?'<br>':c);
+  i++;
+  setTimeout(step,30);
+ }
+
+ step();
+}
+
+document.getElementById("tapScreen").onclick=startGame;
+
+});
+</script>
+
+</body>
+</html>
+
